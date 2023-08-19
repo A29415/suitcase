@@ -1,0 +1,55 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "Project",
+					"targetIndexes" : 
+					[
+						0
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "lvgl::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-lvgl-Debug-47ec5f7ea57c05b0682a.json",
+					"name" : "lvgl",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "C:/Users/HKHH/Desktop/F407实验28 触摸屏实验/GUI/lvgl-8.0.2/out/build/x64-Debug",
+		"source" : "C:/Users/HKHH/Desktop/F407实验28 触摸屏实验/GUI/lvgl-8.0.2"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 2
+	}
+}

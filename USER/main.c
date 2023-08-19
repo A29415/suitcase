@@ -1,0 +1,440 @@
+#include "sys.h"
+#include "delay.h"
+#include "usart.h"
+#include "led.h"
+#include "lcd.h"
+#include "key.h"
+#include "sram.h"
+#include "malloc.h"
+#include "usmart.h"
+#include "sdio_sdcard.h"
+#include "malloc.h"
+#include "w25qxx.h"
+#include "ff.h"
+#include "exfuns.h"
+#include "fontupd.h"
+#include "text.h"
+#include "piclib.h"
+#include "string.h"
+#include "math.h"
+
+#include "beep.h"
+#include "gps.h"
+#include "usart3.h"
+#include "usart2.h"
+#include "iwdg.h"
+#include "dht11.h"
+#include "string.h"
+#include "rain.h"
+#include "exti.h"
+
+extern unsigned char KEY_value;
+
+u8 USART1_TX_BUF[USART3_MAX_RECV_LEN]; 					//串口1,发送缓存区
+nmea_msg gpsx; 											//GPS信息
+__align(4) u8 dtbuf[50];   								//打印缓存器
+const u8*fixmode_tbl[4]= {"Fail","Fail"," 2D "," 3D "};	//fix mode字符串
+__align(4) u8 longtitude[50];
+__align(4) u8 latitude[50];
+__align(4) u8 altitude[50];
+__align(4) u8 speed[50];
+__align(4) u8 Tem[50];
+__align(4) u8 Hum[50];
+u8 t=0;
+u8 temperature;
+u8 humidity;
+int rain;
+
+void showPicture(void);
+void Gps_Msg_Show(void);
+extern int getrain(void);
+void sendData(void);
+
+
+
+//发送GPS定位信息
+void sendData(void)
+{
+    float tp;
+    tp=gpsx.longitude;
+    //得到经度字符串
+    delay_ms(100);
+    //sprintf((char *)longtitude,"Longitude:%.5f %1c   ",tp/=100000,gpsx.ewhemi);
+    sprintf((char *)longtitude,"%.5f %1c   ",tp/=100000,gpsx.ewhemi);
+    delay_ms(10);
+    //u2_printf("%s\r\n",(char*)longtitude);
+    //{ "msg": "Hello, World!" }
+    u2_printf("{ \"Longitude\": \"%s\" }\r\n",(char*)longtitude);
+    //printf("{ \"Longitude\": \"%s\" }\r\n",(char*)longtitude);
+
+    tp=gpsx.latitude;
+    //得到纬度字符串
+    delay_ms(100);
+    //sprintf((char *)latitude,"Latitude:%.5f %1c   ",tp/=100000,gpsx.nshemi);
+    sprintf((char *)latitude,"%.5f %1c   ",tp/=100000,gpsx.nshemi);
+    delay_ms(10);
+    //u2_printf("%s\r\n",(char*)latitude);
+    u2_printf("{ \"Latitude\": \"%s\" }\r\n",(char*)latitude);
+
+    tp=gpsx.altitude;
+    //得到高度字符串
+    delay_ms(100);
+    //sprintf((char *)altitude,"Altitude:%.1fm     ",tp/=10);
+    sprintf((char *)altitude,"%.1fm     ",tp/=10);
+    delay_ms(10);
+    //u2_printf("%s\r\n",(char*)altitude);
+    u2_printf("{ \"Altitude\": \"%s\" }\r\n",(char*)altitude);
+
+    tp=gpsx.speed;
+    //得到速度字符串
+    delay_ms(100);
+    //sprintf((char *)speed,"Speed:%.3fkm/h     ",tp/=1000);
+    sprintf((char *)speed,"%.3fkm/h     ",tp/=1000);
+    delay_ms(10);
+    //u2_printf("%s\r\n",(char*)speed);
+    u2_printf("{ \"Speed\": \"%s\" }\r\n",(char*)speed);
+    //-----------------dht11----------------------
+
+    //得到温度字符串
+    delay_ms(10);
+    //sprintf((char *)Tem,"%d°C ",temperature);
+    //delay_ms(10);
+    u2_printf("{ \"Temperature\": \"%dC\" }\r\n",temperature);
+    delay_ms(10);
+    u2_printf("{ \"Humidity\": \"%d%%\" }\r\n",humidity);
+//	LCD_ShowString(30,600,200,16,16,"send ok^_^");
+   // printf("{ \"Temperature\": \"%dC\" }\r\n",temperature);
+
+//	//判断是否有水
+//	rain= getrain();
+//	delay_ms(10);
+//	u2_printf("{ \"Rain\": \"%d\" }\r\n",rain);
+}
+
+//显示GPS定位信息
+void Gps_Msg_Show(void)
+{
+
+    float tp;
+    //int temp;
+
+    POINT_COLOR=RED;
+    LCD_ShowString(30,20,200,16,16,"STM32F1  M4^_^");
+    LCD_ShowString(30,40,200,16,16,"Anti-lost Package");
+    LCD_ShowString(30,60,200,16,16,"IoT_2518");
+
+    POINT_COLOR=BLUE;
+    //temp = temperature;
+    DHT11_Read_Data(&temperature,&humidity);	//读取温湿度值
+    //LCD_ShowNum(30+90,80,temperature,2,16);	//显示温度
+    //LCD_ShowNum(30+70,100,humidity,2,16);		//显示湿度
+    sprintf((char *)dtbuf,"Temprature: %d C",temperature);
+    LCD_ShowString(30,80,200,16,16,dtbuf);	//℃ °C
+
+    //temp=humidity;
+    sprintf((char *)dtbuf,"Humidity: %d %%",humidity);
+    LCD_ShowString(30,100,200,16,16,dtbuf);
+
+    tp=gpsx.longitude;
+    sprintf((char *)dtbuf,"Longitude:%.5f %1c   ",tp/=100000,gpsx.ewhemi);	//得到经度字符串
+    LCD_ShowString(30,120,200,16,16,dtbuf);
+    tp=gpsx.latitude;
+    sprintf((char *)dtbuf,"Latitude:%.5f %1c   ",tp/=100000,gpsx.nshemi);	//得到纬度字符串
+    LCD_ShowString(30,140,200,16,16,dtbuf);
+    tp=gpsx.altitude;
+    sprintf((char *)dtbuf,"Altitude:%.1fm     ",tp/=10);	    			//得到高度字符串
+    LCD_ShowString(30,160,200,16,16,dtbuf);
+    tp=gpsx.speed;
+    sprintf((char *)dtbuf,"Speed:%.3fkm/h     ",tp/=1000);		    		//得到速度字符串
+    LCD_ShowString(30,180,200,16,16,dtbuf);
+    if(gpsx.fixmode<=3)														//定位状态
+    {
+        sprintf((char *)dtbuf,"Fix Mode:%s",fixmode_tbl[gpsx.fixmode]);
+        LCD_ShowString(30,200,200,16,16,dtbuf);
+    }
+    sprintf((char *)dtbuf,"GPS+BD Valid satellite:%02d",gpsx.posslnum);	 		//用于定位的GPS卫星数
+    LCD_ShowString(30,220,200,16,16,dtbuf);
+    sprintf((char *)dtbuf,"GPS Visible satellite:%02d",gpsx.svnum%100);	 		//可见GPS卫星数
+    LCD_ShowString(30,240,200,16,16,dtbuf);
+
+    sprintf((char *)dtbuf,"BD Visible satellite:%02d",gpsx.beidou_svnum%100);	 		//可见北斗卫星数
+    LCD_ShowString(30,260,200,16,16,dtbuf);
+
+    sprintf((char *)dtbuf,"UTC Date:%04d/%02d/%02d   ",gpsx.utc.year,gpsx.utc.month,gpsx.utc.date);	//显示UTC日期
+    LCD_ShowString(30,280,200,16,16,dtbuf);
+    sprintf((char *)dtbuf,"CN  Time:%02d:%02d:%02d   ",gpsx.utc.hour+8,gpsx.utc.min,gpsx.utc.sec);	//显示UTC时间
+    LCD_ShowString(30,300,200,16,16,dtbuf);
+}
+
+
+//得到path路径下,目标文件的总个数
+//path:路径
+//返回值:总有效文件数
+u16 pic_get_tnum(u8 *path)
+{
+    u8 res;
+    u16 rval=0;
+    DIR tdir;	 		//临时目录
+    FILINFO tfileinfo;	//临时文件信息
+    u8 *fn;
+    res=f_opendir(&tdir,(const TCHAR*)path); 	//打开目录
+    tfileinfo.lfsize=_MAX_LFN*2+1;				//长文件名最大长度
+    tfileinfo.lfname=mymalloc(SRAMIN,tfileinfo.lfsize);//为长文件缓存区分配内存
+    if(res==FR_OK&&tfileinfo.lfname!=NULL)
+    {
+        while(1)//查询总的有效文件数
+        {
+            res=f_readdir(&tdir,&tfileinfo);       		//读取目录下的一个文件
+            if(res!=FR_OK||tfileinfo.fname[0]==0)break;	//错误了/到末尾了,退出
+            fn=(u8*)(*tfileinfo.lfname?tfileinfo.lfname:tfileinfo.fname);
+            res=f_typetell(fn);
+            if((res&0XF0)==0X50)//取高四位,看看是不是图片文件
+            {
+                rval++;//有效文件数增加1
+            }
+        }
+    }
+    return rval;
+}
+
+
+void showPicture(void)
+{
+    u8 res;
+    DIR picdir;	 		//图片目录
+    FILINFO picfileinfo;//文件信息
+    u8 *fn;   			//长文件名
+    u8 *pname;			//带路径的文件名
+    u16 totpicnum; 		//图片文件总数
+    u16 curindex;		//图片当前索引
+
+    u8 t;
+    u16 temp;
+    u16 *picindextbl;	//图片索引表 　
+    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);//设置系统中断优先级分组2
+    //delay_init(168);  //初始化延时函数
+    //uart_init(115200);		//初始化串口波特率为115200
+//    LED_Init();					//初始化LED
+//    usmart_dev.init(84);		//初始化USMART
+//    LCD_Init();					//LCD初始化
+//    KEY_Init();					//按键初始化
+    W25QXX_Init();				//初始化W25Q128
+    my_mem_init(SRAMIN);		//初始化内部内存池
+    my_mem_init(SRAMCCM);		//初始化CCM内存池
+    exfuns_init();			//为fatfs相关变量申请内存
+    f_mount(fs[0],"0:",1); 	//挂载SD卡
+    f_mount(fs[1],"1:",1); 	//挂载FLASH.
+    POINT_COLOR=RED;
+    while(font_init()) 		//检查字库
+    {
+        LCD_ShowString(30,50,200,16,16,"Font Error!");
+        delay_ms(200);
+        LCD_Fill(30,50,240,66,WHITE);//清除显示
+        delay_ms(200);
+    }
+
+    while(f_opendir(&picdir,"0:/PICTURE"))//打开图片文件夹
+    {
+        Show_Str(30,170,240,16,"PICTURE文件夹错误!",16,0);
+        delay_ms(200);
+        LCD_Fill(30,170,240,186,WHITE);//清除显示
+        delay_ms(200);
+    }
+    totpicnum=pic_get_tnum("0:/PICTURE"); //得到总有效文件数
+    while(totpicnum==NULL)//图片文件为0
+    {
+        Show_Str(30,170,240,16,"没有图片文件!",16,0);
+        delay_ms(200);
+        LCD_Fill(30,170,240,186,WHITE);//清除显示
+        delay_ms(200);
+    }
+    picfileinfo.lfsize=_MAX_LFN*2+1;						//长文件名最大长度
+    picfileinfo.lfname=mymalloc(SRAMIN,picfileinfo.lfsize);	//为长文件缓存区分配内存
+    pname=mymalloc(SRAMIN,picfileinfo.lfsize);				//为带路径的文件名分配内存
+    picindextbl=mymalloc(SRAMIN,2*totpicnum);				//申请2*totpicnum个字节的内存,用于存放图片索引
+    while(picfileinfo.lfname==NULL||pname==NULL||picindextbl==NULL)//内存分配出错
+    {
+        Show_Str(30,170,240,16,"内存分配失败!",16,0);
+        delay_ms(200);
+        LCD_Fill(30,170,240,186,WHITE);//清除显示
+        delay_ms(200);
+    }
+    //记录索引
+    res=f_opendir(&picdir,"0:/PICTURE"); //打开目录
+    if(res==FR_OK)
+    {
+        curindex=0;//当前索引为0
+        while(1)//全部查询一遍
+        {
+            temp=picdir.index;								//记录当前index
+            res=f_readdir(&picdir,&picfileinfo);       		//读取目录下的一个文件
+            if(res!=FR_OK||picfileinfo.fname[0]==0)break;	//错误了/到末尾了,退出
+            fn=(u8*)(*picfileinfo.lfname?picfileinfo.lfname:picfileinfo.fname);
+            res=f_typetell(fn);
+            if((res&0XF0)==0X50)//取高四位,看看是不是图片文件
+            {
+                picindextbl[curindex]=temp;//记录索引
+                curindex++;
+            }
+        }
+    }
+    //Show_Str(30,170,240,16,"开始显示...",16,0);
+    delay_ms(1500);
+    piclib_init();										//初始化画图
+    curindex=0;											//从0开始显示
+    res=f_opendir(&picdir,(const TCHAR*)"0:/PICTURE"); 	//打开目录
+    while(res==FR_OK)//打开成功
+    {
+        dir_sdi(&picdir,picindextbl[curindex]);			//改变当前目录索引
+        res=f_readdir(&picdir,&picfileinfo);       		//读取目录下的一个文件
+        if(res!=FR_OK||picfileinfo.fname[0]==0)break;	//错误了/到末尾了,退出
+        fn=(u8*)(*picfileinfo.lfname?picfileinfo.lfname:picfileinfo.fname);
+        strcpy((char*)pname,"0:/PICTURE/");				//复制路径(目录)
+        strcat((char*)pname,(const char*)fn);  			//将文件名接在后面
+        LCD_Clear(BLACK);
+        ai_load_picfile(pname,0,0,lcddev.width,lcddev.height,1);//显示图片
+        Show_Str(2,2,240,16,pname,16,1); 				//显示图片名字
+        t=0;
+        while(1)
+        {
+            if(KEY_value==key_0)
+            {
+                KEY_value = key_free;
+                res=!FR_OK;
+                //Gps_Msg_Show();
+                break;
+            }
+        }
+        res=0;
+		res=!FR_OK; 
+    }
+    myfree(SRAMIN,picfileinfo.lfname);	//释放内存
+    myfree(SRAMIN,pname);				//释放内存
+    myfree(SRAMIN,picindextbl);			//释放内存
+
+    LCD_Clear(WHITE);
+    //Gps_Msg_Show();
+    KEY_value = key_free;
+}
+
+
+
+//---------------------------------------------------------------------------------
+int main(void)
+{
+    u16 i,rxlen;
+    u16 lenx;
+    u8 key =0XFF;
+//	u8 k;
+//	u8 upload=0;
+    delay_init(168);	    	 //延时函数初始化
+    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);//设置中断优先级分组为组2：2位抢占优先级，2位响应优先级
+    uart_init(115200);	 	//串口初始化为115200
+
+    usmart_dev.init(72);		//初始化USMART
+    LED_Init();		  			//初始化与LED连接的硬件接口
+    KEY_Init();					//初始化按键
+    BEEP_Init();
+    EXTIX_Init();
+    LCD_Init();			   		//初始化LCD
+    usart2_init(9600);
+    usart3_init(115200);		//初始化串口3
+
+    TIM3_Int_Init(4999,83);	//定时器初始化(10ms中断),用于给lvgl提供10ms的心跳节拍
+
+    TIM2_Int_Init(20000-1,8400-1);		//100ms中断
+    IWDG_Init(4,2000);    //与分频数为64,重载值为500,溢出时间为1s
+
+    POINT_COLOR=RED;
+    LCD_ShowString(30,20,200,16,16,"STM32F4  M4^_^");
+    LCD_ShowString(30,40,200,16,16,"Anti-lost Package");
+    LCD_ShowString(30,60,200,16,16,"IoT_2518");
+
+    //-----------dht11----------------
+    while(DHT11_Init())	//DHT11初始化
+    {
+        LCD_ShowString(30,130,200,16,16,"DHT11 Error");
+        delay_ms(200);
+        LCD_Fill(30,130,239,130+16,WHITE);
+        delay_ms(200);
+    }
+//------dht11-----
+    if(t%10==0)			//每100ms读取一次
+    {
+        DHT11_Read_Data(&temperature,&humidity);	//读取温湿度值
+        //LCD_ShowString(30,80,200,16,16,"KEY0:Upload NMEA Data SW");
+        //LCD_ShowString(30,100,200,16,16,"NMEA Data Upload:OFF");
+    }
+    delay_ms(10);
+    t++;
+    if(t==20)
+    {
+        t=0;
+        //LED0=!LED0;
+    }
+
+
+    if(SkyTra_Cfg_Rate(5)!=0)	//设置定位信息更新速度为5Hz,顺便判断GPS模块是否在位.
+    {
+        LCD_ShowString(30,120,200,16,16,"SkyTraF8-BD Setting...");
+        do
+        {
+            usart3_init(9600);			//初始化串口3波特率为9600
+            SkyTra_Cfg_Prt(3);			//重新设置模块的波特率为38400
+            usart3_init(38400);			//初始化串口3波特率为38400
+            key=SkyTra_Cfg_Tp(100000);	//脉冲宽度为100ms
+        } while(SkyTra_Cfg_Rate(5)!=0&&key!=0);//配置SkyTraF8-BD的更新速率为5Hz
+        LCD_ShowString(30,120,200,16,16,"SkyTraF8-BD Set Done!!");
+        delay_ms(500);
+        LCD_Fill(30,120,30+200,120+16,WHITE);//清除显示
+    }
+
+
+    while(1)
+    {
+        delay_ms(1);
+        if(USART3_RX_STA&0X8000)		//接收到一次数据了
+        {
+            rxlen=USART3_RX_STA&0X7FFF;	//得到数据长度
+            for(i=0; i<rxlen; i++)USART1_TX_BUF[i]=USART3_RX_BUF[i];
+            USART3_RX_STA=0;		   	//启动下一次接收
+            USART1_TX_BUF[i]=0;			//自动添加结束符
+            GPS_Analysis(&gpsx,(u8*)USART1_TX_BUF);//分析字符串
+            Gps_Msg_Show();
+            //LCD_Clear(WHITE);
+            //showPicture();
+            //sendData();
+            //if(upload)printf("\r\n%s\r\n",USART1_TX_BUF);//发送接收到的数据到串口
+
+        }
+        //LCD_Clear(WHITE);
+        //showPicture();
+        //k=KEY_Scan(0);
+        //if(k==KEY0_PRES)
+        if(KEY_value==key_0)
+        {
+            KEY_value = key_free;
+            LCD_Clear(BLACK);
+            //LCD_ShowString(30,120,200,16,16,"Loading...");
+            showPicture();
+
+        }
+        delay_ms(500);
+        KEY_value = key_free;
+
+        if((lenx%500)==0)
+            LED0=!LED0;
+        //IWDG_Feed();
+        lenx++;
+
+    }
+
+}
+
+
+
+
+
+
+
+

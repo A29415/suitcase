@@ -1,0 +1,10 @@
+#ifndef __RAIN_H
+#define __RAIN_H	 
+#include "sys.h"
+
+#define RAIN PAin(0)
+extern int getain(void);
+void RAIN_Init(void);
+
+
+#endif

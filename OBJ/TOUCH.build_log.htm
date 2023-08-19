@@ -1,0 +1,111 @@
+<html>
+<body>
+<pre>
+<h1>礦ision Build Log</h1>
+<h2>Tool Versions:</h2>
+IDE-Version: μVision V5.36.0.0
+Copyright (C) 2021 ARM Ltd and ARM Germany GmbH. All rights reserved.
+License Information: 1 11, 111, LIC=D0D7S-LANF4-IIF5V-PKS1P-QG69V-1P71I
+ 
+Tool Versions:
+Toolchain:       MDK-ARM Plus  Version: 5.36.0.0
+Toolchain Path:  D:\Keil_v5\ARM\ARMCC\Bin
+C Compiler:      Armcc.exe V5.06 update 7 (build 960)
+Assembler:       Armasm.exe V5.06 update 7 (build 960)
+Linker/Locator:  ArmLink.exe V5.06 update 7 (build 960)
+Library Manager: ArmAr.exe V5.06 update 7 (build 960)
+Hex Converter:   FromElf.exe V5.06 update 7 (build 960)
+CPU DLL:         SARMCM3.DLL V5.36.0.0
+Dialog DLL:      DCM.DLL V1.17.3.0
+Target DLL:      STLink\ST-LINKIII-KEIL_SWO.dll V3.0.9.0
+Dialog DLL:      TCM.DLL V1.53.0.0
+ 
+<h2>Project:</h2>
+C:\Users\HKHH\Desktop\F4-GPS\USER\TOUCH.uvprojx
+Project File Date:  10/08/2021
+
+<h2>Output:</h2>
+*** Using Compiler 'V5.06 update 7 (build 960)', folder: 'D:\Keil_v5\ARM\ARMCC\Bin'
+Build target 'TOUCH'
+compiling cc932.c...
+..\FATFS\src\option\cc932.c(12): error:  #35: #error directive: This file is not needed in current configuration. Remove from the project.
+  #error This file is not needed in current configuration. Remove from the project.
+..\FATFS\src\option\cc932.c: 0 warnings, 1 error
+compiling cc949.c...
+..\FATFS\src\option\cc949.c(11): error:  #35: #error directive: This file is not needed in current configuration. Remove from the project.
+  #error This file is not needed in current configuration. Remove from the project.
+..\FATFS\src\option\cc949.c: 0 warnings, 1 error
+compiling cc950.c...
+..\FATFS\src\option\cc950.c(11): error:  #35: #error directive: This file is not needed in current configuration. Remove from the project.
+  #error This file is not needed in current configuration. Remove from the project.
+..\FATFS\src\option\cc950.c: 0 warnings, 1 error
+compiling i2s.c...
+..\HARDWARE\I2S\i2s.c(2): error:  #5: cannot open source input file "includes.h": No such file or directory
+  #include "includes.h"
+..\HARDWARE\I2S\i2s.c: 0 warnings, 1 error
+compiling rain.c...
+..\HARDWARE\RAIN\rain.h(7): warning:  #1295-D: Deprecated declaration RAIN_Init - give arg types
+  void RAIN_Init();
+..\HARDWARE\RAIN\rain.c(7): error:  #20: identifier "RCC_APB2Periph_GPIOA" is undefined
+   RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);	
+..\HARDWARE\RAIN\rain.c(11): error:  #20: identifier "GPIO_Mode_IPU" is undefined
+   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU; 		 	 
+..\HARDWARE\RAIN\rain.c: 1 warning, 2 errors
+compiling dht11.c...
+..\HARDWARE\DHT11\dht11.c(109): warning:  #223-D: function "GPIO_Set" declared implicitly
+  	GPIO_Set(GPIOG,PIN9,GPIO_MODE_OUT,GPIO_OTYPE_PP,GPIO_SPEED_50M,GPIO_PUPD_PU);//PG9设置  
+..\HARDWARE\DHT11\dht11.c(109): error:  #20: identifier "PIN9" is undefined
+  	GPIO_Set(GPIOG,PIN9,GPIO_MODE_OUT,GPIO_OTYPE_PP,GPIO_SPEED_50M,GPIO_PUPD_PU);//PG9设置  
+..\HARDWARE\DHT11\dht11.c(109): error:  #20: identifier "GPIO_MODE_OUT" is undefined
+  	GPIO_Set(GPIOG,PIN9,GPIO_MODE_OUT,GPIO_OTYPE_PP,GPIO_SPEED_50M,GPIO_PUPD_PU);//PG9设置  
+..\HARDWARE\DHT11\dht11.c(109): error:  #20: identifier "GPIO_OTYPE_PP" is undefined
+  	GPIO_Set(GPIOG,PIN9,GPIO_MODE_OUT,GPIO_OTYPE_PP,GPIO_SPEED_50M,GPIO_PUPD_PU);//PG9设置  
+..\HARDWARE\DHT11\dht11.c(109): error:  #20: identifier "GPIO_SPEED_50M" is undefined
+  	GPIO_Set(GPIOG,PIN9,GPIO_MODE_OUT,GPIO_OTYPE_PP,GPIO_SPEED_50M,GPIO_PUPD_PU);//PG9设置  
+..\HARDWARE\DHT11\dht11.c(109): error:  #20: identifier "GPIO_PUPD_PU" is undefined
+  	GPIO_Set(GPIOG,PIN9,GPIO_MODE_OUT,GPIO_OTYPE_PP,GPIO_SPEED_50M,GPIO_PUPD_PU);//PG9设置  
+..\HARDWARE\DHT11\dht11.c: 1 warning, 5 errors
+compiling usart3.c...
+..\HARDWARE\USART3\usart3.c(7): error:  #5: cannot open source input file "ucos_ii.h": No such file or directory
+  #include "ucos_ii.h"
+..\HARDWARE\USART3\usart3.c: 0 warnings, 1 error
+compiling ccsbcs.c...
+..\FATFS\src\option\ccsbcs.c(497): error:  #35: #error directive: This file is not needed in current configuration. Remove from the project.
+  #error This file is not needed in current configuration. Remove from the project.
+..\FATFS\src\option\ccsbcs.c: 0 warnings, 1 error
+compiling exti.c...
+..\HARDWARE\EXTI\exti.c(66): warning:  #223-D: function "Ex_NVIC_Config" declared implicitly
+  	Ex_NVIC_Config(GPIO_E,2,FTIR); 		//下降沿触发
+..\HARDWARE\EXTI\exti.c(66): error:  #20: identifier "GPIO_E" is undefined
+  	Ex_NVIC_Config(GPIO_E,2,FTIR); 		//下降沿触发
+..\HARDWARE\EXTI\exti.c(66): error:  #20: identifier "FTIR" is undefined
+  	Ex_NVIC_Config(GPIO_E,2,FTIR); 		//下降沿触发
+..\HARDWARE\EXTI\exti.c(69): error:  #20: identifier "GPIO_A" is undefined
+   	Ex_NVIC_Config(GPIO_A,0,RTIR); 	 	//上升沿触发 
+..\HARDWARE\EXTI\exti.c(69): error:  #20: identifier "RTIR" is undefined
+   	Ex_NVIC_Config(GPIO_A,0,RTIR); 	 	//上升沿触发 
+..\HARDWARE\EXTI\exti.c(70): warning:  #223-D: function "MY_NVIC_Init" declared implicitly
+  	MY_NVIC_Init(3,2,EXTI2_IRQn,2);		//抢占3，子优先级2，组2
+..\HARDWARE\EXTI\exti.c: 2 warnings, 4 errors
+compiling main.c...
+main.c(377): error:  #5: cannot open source input file "usart2.h": No such file or directory
+  #include "usart2.h" 
+main.c: 0 warnings, 1 error
+"..\OBJ\TOUCH.axf" - 18 Error(s), 4 Warning(s).
+
+<h2>Software Packages used:</h2>
+
+Package Vendor: Keil
+                http://www.keil.com/pack/Keil.STM32F4xx_DFP.2.11.0.pack
+                Keil.STM32F4xx_DFP.2.11.0
+                STMicroelectronics STM32F4 Series Device Support, Drivers and Examples
+
+<h2>Collection of Component include folders:</h2>
+  D:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.11.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include
+
+<h2>Collection of Component Files used:</h2>
+Target not created.
+Build Time Elapsed:  00:00:03
+</pre>
+</body>
+</html>
